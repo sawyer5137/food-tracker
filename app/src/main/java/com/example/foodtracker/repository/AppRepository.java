@@ -1,0 +1,61 @@
+package com.example.foodtracker.repository;
+
+import android.content.Context;
+
+import androidx.lifecycle.LiveData;
+
+import com.example.foodtracker.database.FoodDatabase;
+import com.example.foodtracker.database.FoodItemDao;
+import com.example.foodtracker.database.StorageLocationDao;
+import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.StorageLocation;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class AppRepository {
+    private FoodItemDao foodItemDao;
+    private StorageLocationDao storageLocationDao;
+    private LiveData<List<FoodItem>> allFoodItems;
+    private LiveData<List<StorageLocation>> allStorageLocations;
+    private static final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
+
+    public AppRepository(Context context) {
+        FoodDatabase db = FoodDatabase.getInstance(context);
+        foodItemDao = db.foodItemDao();
+        storageLocationDao = db.storageLocationDao();
+        allFoodItems = foodItemDao.getAllFoodItems();
+        allStorageLocations = storageLocationDao.getAllStorageLocations();
+    }
+
+    // FoodItem Methods
+    public LiveData<List<FoodItem>> getAllFoodItems() {
+        return allFoodItems;
+    }
+
+    public LiveData<List<FoodItem>> getFoodItemsByLocation(int locationId) {
+        return foodItemDao.getFoodItemsByLocation(locationId);
+    }
+
+    public void insertFoodItem(FoodItem foodItem) {
+        databaseExecutor.execute(() -> foodItemDao.insertFoodItems(foodItem));
+    }
+
+    public void deleteFoodItem(FoodItem foodItem) {
+        databaseExecutor.execute(() -> foodItemDao.deleteFoodItems(foodItem));
+    }
+
+    // StorageLocation Methods
+    public LiveData<List<StorageLocation>> getAllStorageLocations() {
+        return allStorageLocations;
+    }
+
+    public void insertStorageLocation(StorageLocation storageLocation) {
+        databaseExecutor.execute(() -> storageLocationDao.insertStorageLocations(storageLocation));
+    }
+
+    public void deleteStorageLocation(StorageLocation storageLocation) {
+        databaseExecutor.execute(() -> storageLocationDao.deleteStorageLocations(storageLocation));
+    }
+}
