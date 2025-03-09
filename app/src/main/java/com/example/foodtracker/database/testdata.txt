@@ -1,0 +1,47 @@
+// Expired Items (Expiration date < Today)
+        FoodItem f1 = new FoodItem("Milk", 1, "Gallon", new Date(124, 11, 10), new Date(124, 10, 30), 1); // Expired
+        FoodItem f2 = new FoodItem("Eggs", 12, "Carton", new Date(124, 10, 25), new Date(124, 9, 15), 1); // Expired
+        FoodItem f3 = new FoodItem("Bread", 2, "Loaves", new Date(124, 8, 5), new Date(124, 7, 20), 1);  // Expired
+        FoodItem f4 = new FoodItem("Butter", 1, "Pound", new Date(124, 6, 18), new Date(124, 5, 28), 1); // Expired
+        FoodItem f5 = new FoodItem("Cheese", 1, "Block", new Date(124, 5, 12), new Date(124, 4, 22), 1); // Expired
+
+// Future Expiration Dates
+        FoodItem f6 = new FoodItem("Yogurt", 6, "Cups", new Date(125, 6, 18), new Date(125, 6, 1), 1);
+        FoodItem f7 = new FoodItem("Apples", 10, "Pieces", new Date(125, 7, 10), new Date(125, 6, 28), 1);
+        FoodItem f8 = new FoodItem("Chicken", 5, "Pounds", new Date(125, 8, 2), new Date(125, 7, 15), 1);
+        FoodItem f9 = new FoodItem("Ground Beef", 3, "Pounds", new Date(125, 7, 25), new Date(125, 7, 10), 1);
+        FoodItem f10 = new FoodItem("Pasta", 2, "Boxes", new Date(126, 5, 30), new Date(125, 10, 5), 1);
+        FoodItem f11 = new FoodItem("Rice", 10, "Pounds", new Date(127, 2, 15), new Date(125, 9, 20), 1);
+        FoodItem f12 = new FoodItem("Cereal", 1, "Box", new Date(125, 11, 12), new Date(125, 10, 25), 1);
+        FoodItem f13 = new FoodItem("Peanut Butter", 1, "Jar", new Date(127, 0, 20), new Date(125, 8, 10), 1);
+        FoodItem f14 = new FoodItem("Jelly", 1, "Jar", new Date(126, 8, 5), new Date(125, 7, 18), 1);
+        FoodItem f15 = new FoodItem("Carrots", 5, "Pounds", new Date(125, 6, 10), new Date(125, 5, 30), 1);
+        FoodItem f16 = new FoodItem("Potatoes", 10, "Pounds", new Date(126, 3, 18), new Date(125, 11, 12), 1);
+        FoodItem f17 = new FoodItem("Tomatoes", 6, "Pounds", new Date(125, 5, 22), new Date(125, 5, 5), 1);
+        FoodItem f18 = new FoodItem("Bananas", 8, "Bunches", new Date(125, 4, 28), new Date(125, 4, 15), 1);
+        FoodItem f19 = new FoodItem("Oranges", 10, "Pieces", new Date(125, 6, 5), new Date(125, 5, 20), 1);
+        FoodItem f20 = new FoodItem("Chocolate", 3, "Bars", new Date(127, 1, 10), new Date(125, 10, 1), 1);
+
+// Insert into ViewModel
+        foodViewModel.insert(f1);
+        foodViewModel.insert(f2);
+        foodViewModel.insert(f3);
+        foodViewModel.insert(f4);
+        foodViewModel.insert(f5);
+        foodViewModel.insert(f6);
+        foodViewModel.insert(f7);
+        foodViewModel.insert(f8);
+        foodViewModel.insert(f9);
+        foodViewModel.insert(f10);
+        foodViewModel.insert(f11);
+        foodViewModel.insert(f12);
+        foodViewModel.insert(f13);
+        foodViewModel.insert(f14);
+        foodViewModel.insert(f15);
+        foodViewModel.insert(f16);
+        foodViewModel.insert(f17);
+        foodViewModel.insert(f18);
+        foodViewModel.insert(f19);
+        foodViewModel.insert(f20);
+
+

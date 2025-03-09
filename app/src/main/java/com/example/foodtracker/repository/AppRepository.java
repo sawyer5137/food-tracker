@@ -38,6 +38,10 @@ public class AppRepository {
         return foodItemDao.getFoodItemsByLocation(locationId);
     }
 
+    public LiveData<FoodItem> getFoodItemById(int foodId){
+        return foodItemDao.getFoodItemByID(foodId);
+    }
+
     public void insertFoodItem(FoodItem foodItem) {
         databaseExecutor.execute(() -> foodItemDao.insertFoodItems(foodItem));
     }
@@ -57,5 +61,9 @@ public class AppRepository {
 
     public void deleteStorageLocation(StorageLocation storageLocation) {
         databaseExecutor.execute(() -> storageLocationDao.deleteStorageLocations(storageLocation));
+    }
+
+    public void updateFoodItem(FoodItem foodItem) {
+        databaseExecutor.execute(()->foodItemDao.updateFoodItems(foodItem));
     }
 }

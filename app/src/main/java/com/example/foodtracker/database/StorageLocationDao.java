@@ -23,6 +23,6 @@ public interface StorageLocationDao {
     @Delete
     public void deleteStorageLocations(StorageLocation... storageLocations);
 
-    @Query("SELECT * FROM STORAGE_LOCATIONS")
+    @Query("SELECT * FROM STORAGELOCATION")
         public LiveData<List<StorageLocation>> getAllStorageLocations();
 }

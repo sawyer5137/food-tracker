@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Food Tracker</string>
+    <string name="apple_emoji">🍔</string>
+    <string name="expires_on_text">Expires on %1$s - %2$s days left</string>
+    <string name="expired_on_text">Expired on %1$s - %2$s days ago</string>
+    <string name="add_item">Add Item</string>
 </resources>

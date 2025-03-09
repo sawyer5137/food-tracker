@@ -14,21 +14,19 @@ import java.util.List;
 public class FoodViewModel extends AndroidViewModel {
     private AppRepository repository;
     private LiveData<List<FoodItem>> allFoodItems;
-    private LiveData<List<StorageLocation>> allStorageLocations;
 
     public FoodViewModel(Application application) {
         super(application);
         repository = new AppRepository(application);
         allFoodItems = repository.getAllFoodItems();
-        allStorageLocations = repository.getAllStorageLocations();
     }
 
     public LiveData<List<FoodItem>> getAllFoodItems() {
         return allFoodItems;
     }
 
-    public LiveData<List<StorageLocation>> getAllStorageLocations() {
-        return allStorageLocations;
+    public LiveData<FoodItem> getFoodItemById(int id) {
+        return repository.getFoodItemById(id);
     }
 
     public LiveData<List<FoodItem>> getFoodItemsByLocation(int locationId) {
@@ -37,6 +35,10 @@ public class FoodViewModel extends AndroidViewModel {
 
     public void insert(FoodItem foodItem) {
         repository.insertFoodItem(foodItem);
+    }
+
+    public void update(FoodItem foodItem) {
+        repository.updateFoodItem(foodItem);
     }
 
 }
