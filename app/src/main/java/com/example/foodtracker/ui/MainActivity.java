@@ -34,13 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FoodAdapter adapter;
 
-    // Helper function to generate a future date
-    public static Date getFutureDate(int daysAhead) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, daysAhead);
-        return calendar.getTime();
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,22 +46,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        //Initialize recycler view
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        //Set up adapter - initially empty list because data comes async from live data
-        adapter = new FoodAdapter(new ArrayList<>());
-        recyclerView.setAdapter(adapter);
-
-        //Get FoodViewModel
-        foodViewModel = new ViewModelProvider(this).get(FoodViewModel.class);
-
-        // Observe live data and populate recycler view
-        foodViewModel.getAllFoodItems().observe(this, foodItems -> {
-            Log.d(TAG, foodItems.toString());
-            adapter.setFoodList(foodItems);
-        });
+        // Show HomeFragment by default
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit();
+        }
 
     }
 }

@@ -4,4 +4,6 @@
     <string name="expires_on_text">Expires on %1$s - %2$s days left</string>
     <string name="expired_on_text">Expired on %1$s - %2$s days ago</string>
     <string name="add_item">Add Item</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
