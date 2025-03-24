@@ -1,8 +1,7 @@
-package com.example.foodtracker.ui;
+package com.example.foodtracker.ui.fragments;
 
 import android.os.Bundle;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,12 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.foodtracker.R;
-import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.ui.adapter.FoodAdapter;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class HomeFragment extends Fragment {
 
