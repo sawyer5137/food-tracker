@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
     private List<FoodItem> foodList;
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault()); // ✅ Define it once
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault());
 
     // Constructor
     public FoodAdapter(List<FoodItem> foodList) {
