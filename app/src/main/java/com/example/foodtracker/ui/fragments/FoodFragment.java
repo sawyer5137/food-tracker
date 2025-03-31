@@ -20,11 +20,11 @@ import com.example.foodtracker.viewmodel.FoodViewModel;
 
 import java.util.ArrayList;
 
-public class HomeFragment extends Fragment {
+public class FoodFragment extends Fragment {
 
     public final String TAG = "HomeFragment";
 
-    public HomeFragment() {
+    public FoodFragment() {
         // Required empty public constructor
     }
 
@@ -57,6 +57,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_foods, container, false);
     }
 }
