@@ -10,7 +10,7 @@ import com.example.foodtracker.converters.DateConverter;
 import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.models.StorageLocation;
 
-@Database(entities = {FoodItem.class, StorageLocation.class}, version = 1)
+@Database(entities = {FoodItem.class, StorageLocation.class}, version = 2)
 @TypeConverters({DateConverter.class})
 public abstract class FoodDatabase extends RoomDatabase {
     private static volatile FoodDatabase INSTANCE;

@@ -12,7 +12,7 @@ public class FoodItem {
     @PrimaryKey(autoGenerate = true)
     public long id;
     public String name;
-    public int quantity;
+    public double quantity;
     public String unit;
     public Date expirationDate;
     public Date purchaseDate;
@@ -20,7 +20,7 @@ public class FoodItem {
 
     public FoodItem() {}
 
-    public FoodItem(String name, int quantity, String unit, Date expirationDate, Date purchaseDate, long storageLocationId) {
+    public FoodItem(String name, double quantity, String unit, Date expirationDate, Date purchaseDate, long storageLocationId) {
         this.name = name;
         this.quantity = quantity;
         this.unit = unit;

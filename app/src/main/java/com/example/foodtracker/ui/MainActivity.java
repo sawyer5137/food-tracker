@@ -1,14 +1,16 @@
 package com.example.foodtracker.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.foodtracker.R;
-import com.example.foodtracker.ui.fragments.AddFragment;
 import com.example.foodtracker.ui.fragments.FoodFragment;
 import com.example.foodtracker.ui.fragments.SettingsFragment;
+import com.example.foodtracker.ui.fragments.StorageFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,14 +38,20 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_food) {
+                Log.d("NAV", "FoodFragment selected");
                 selectedFragment = new FoodFragment();
             } else if (id == R.id.nav_locations) {
-                selectedFragment = new AddFragment();
+                Log.d("NAV", "StorageFragment selected");
+                selectedFragment = new StorageFragment();
             } else if (id == R.id.nav_settings) {
+                Log.d("NAV", "SettingsFragment selected");
                 selectedFragment = new SettingsFragment();
             }
 
             if (selectedFragment != null) {
+                // 🔥 Clear any previous fragment back stack to prevent leftovers
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
@@ -51,5 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
+
     }
 }
