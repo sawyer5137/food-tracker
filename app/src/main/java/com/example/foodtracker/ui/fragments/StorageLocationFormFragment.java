@@ -34,7 +34,7 @@ public class StorageLocationFormFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        storageNameInput = view.findViewById(R.id.storageLocationName);
+        storageNameInput = view.findViewById(R.id.storageLocationNameInput);
         submitButton = view.findViewById(R.id.storageSubmitButton);
 
         StorageLocationViewModel viewModel = new ViewModelProvider(requireActivity()).get(StorageLocationViewModel.class);

@@ -1,9 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.FoodTracker" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.FoodTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme if needed -->
+        <!-- Example: <item name="colorPrimary">@color/your_color</item> -->
     </style>
-
-    <style name="Theme.FoodTracker" parent="Base.Theme.FoodTracker" />
 </resources>

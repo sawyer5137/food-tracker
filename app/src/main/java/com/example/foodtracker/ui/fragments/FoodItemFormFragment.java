@@ -11,19 +11,25 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.viewmodel.FoodViewModel;
+import com.example.foodtracker.viewmodel.StorageLocationViewModel;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class FoodItemFormFragment extends Fragment {
@@ -31,8 +37,10 @@ public class FoodItemFormFragment extends Fragment {
     private EditText foodNameInput, amountInput, customUnitInput, purchaseDateInput, expireDateInput;
     private Spinner unitSpinner;
     private Button submitButton;
-
+    private Spinner locationSpinner;
+    private List<StorageLocation> storageLocations;
     private FoodViewModel viewModel;
+    private StorageLocationViewModel locationViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,12 +58,34 @@ public class FoodItemFormFragment extends Fragment {
         purchaseDateInput = view.findViewById(R.id.purchaseDateInput);
         expireDateInput = view.findViewById(R.id.expireDateInput);
         submitButton = view.findViewById(R.id.submitButton);
+        locationSpinner = view.findViewById(R.id.storageLocationDropdown);
 
         // Get the ViewModel
         viewModel = new ViewModelProvider(requireActivity()).get(FoodViewModel.class);
+        locationViewModel = new ViewModelProvider(this).get(StorageLocationViewModel.class);
 
         purchaseDateInput.setOnClickListener(v -> showDatePicker(purchaseDateInput));
         expireDateInput.setOnClickListener(v -> showDatePicker(expireDateInput));
+
+        locationViewModel.getAllStorageLocations().observe(getViewLifecycleOwner(), locations -> {
+            this.storageLocations = locations;
+
+            List<String> locationNames = new ArrayList<>();
+            for (StorageLocation loc : locations) {
+                locationNames.add(loc.name);
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    locationNames
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            locationSpinner.setAdapter(adapter);
+
+            // Optional: set default selection
+            locationSpinner.setSelection(0);
+        });
 
 
         submitButton.setOnClickListener(v -> {

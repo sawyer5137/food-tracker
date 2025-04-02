@@ -5,10 +5,12 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.models.StorageLocation;
+import com.example.foodtracker.ui.adapter.StorageLocationWithItems;
 
 import java.util.List;
 
@@ -25,4 +27,8 @@ public interface StorageLocationDao {
 
     @Query("SELECT * FROM STORAGELOCATION")
         public LiveData<List<StorageLocation>> getAllStorageLocations();
+
+    @Transaction
+    @Query("SELECT * FROM StorageLocation")
+    LiveData<List<StorageLocationWithItems>> getAllStorageLocationsWithItems();
 }

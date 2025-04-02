@@ -2,11 +2,23 @@ package com.example.foodtracker.models;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import java.util.Calendar;
 import java.util.Date;
-@Entity
+
+@Entity(
+    foreignKeys = @ForeignKey(
+            entity = StorageLocation.class,
+            parentColumns = "id",
+            childColumns = "storageLocationId",
+            onDelete = ForeignKey.CASCADE
+    ),
+    indices = {@Index("storageLocationId")}
+)
+
 public class FoodItem {
 
     @PrimaryKey(autoGenerate = true)

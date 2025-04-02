@@ -9,6 +9,7 @@ import com.example.foodtracker.database.FoodItemDao;
 import com.example.foodtracker.database.StorageLocationDao;
 import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.models.StorageLocation;
+import com.example.foodtracker.ui.adapter.StorageLocationWithItems;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +20,7 @@ public class AppRepository {
     private StorageLocationDao storageLocationDao;
     private LiveData<List<FoodItem>> allFoodItems;
     private LiveData<List<StorageLocation>> allStorageLocations;
+    private final LiveData<List<StorageLocationWithItems>> allLocationsWithItems;
     private static final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
 
     public AppRepository(Context context) {
@@ -27,6 +29,7 @@ public class AppRepository {
         storageLocationDao = db.storageLocationDao();
         allFoodItems = foodItemDao.getAllFoodItems();
         allStorageLocations = storageLocationDao.getAllStorageLocations();
+        allLocationsWithItems = storageLocationDao.getAllStorageLocationsWithItems();
     }
 
     // FoodItem Methods
@@ -50,6 +53,10 @@ public class AppRepository {
         databaseExecutor.execute(() -> foodItemDao.deleteFoodItems(foodItem));
     }
 
+    public void updateFoodItem(FoodItem foodItem) {
+        databaseExecutor.execute(()->foodItemDao.updateFoodItems(foodItem));
+    }
+
     // StorageLocation Methods
     public LiveData<List<StorageLocation>> getAllStorageLocations() {
         return allStorageLocations;
@@ -63,7 +70,8 @@ public class AppRepository {
         databaseExecutor.execute(() -> storageLocationDao.deleteStorageLocations(storageLocation));
     }
 
-    public void updateFoodItem(FoodItem foodItem) {
-        databaseExecutor.execute(()->foodItemDao.updateFoodItems(foodItem));
+    public LiveData<List<StorageLocationWithItems>> getAllStorageLocationsWithItems() {
+        return allLocationsWithItems;
     }
+
 }
