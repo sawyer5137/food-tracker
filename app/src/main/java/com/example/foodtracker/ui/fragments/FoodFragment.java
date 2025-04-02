@@ -66,7 +66,20 @@ public class FoodFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Set up adapter - initially empty list because data comes async from LiveData
-        FoodAdapter adapter = new FoodAdapter(new ArrayList<>());
+        FoodAdapter adapter = new FoodAdapter(new ArrayList<>(), item -> {
+            // Handle click here, e.g., open edit fragment
+            EditFoodItemFragment fragment = new EditFoodItemFragment();
+
+            Bundle args = new Bundle();
+            args.putSerializable("foodItem", item);
+            fragment.setArguments(args);
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
         recyclerView.setAdapter(adapter);
 
         // Get ViewModel

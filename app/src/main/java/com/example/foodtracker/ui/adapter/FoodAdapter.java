@@ -20,11 +20,18 @@ import java.util.Locale;
 
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
+
+    public interface OnFoodClickListener {
+        void onFoodClick(FoodItem item);
+    }
+
     private List<FoodItem> foodList;
+    private final OnFoodClickListener listener;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault());
 
     // Constructor
-    public FoodAdapter(List<FoodItem> foodList) {
+    public FoodAdapter(List<FoodItem> foodList, OnFoodClickListener listener) {
+        this.listener = listener;
         this.foodList = foodList;
     }
 
@@ -61,6 +68,12 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         holder.foodName.setText(foodItem.name);
         holder.expirationDate.setText(expirationText);
         holder.expirationDate.setTextColor(textColor);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onFoodClick(foodItem);
+            }
+        });
     }
 
     @Override

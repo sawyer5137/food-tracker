@@ -6,6 +6,7 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ import java.util.Date;
     indices = {@Index("storageLocationId")}
 )
 
-public class FoodItem {
+public class FoodItem implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     public long id;
