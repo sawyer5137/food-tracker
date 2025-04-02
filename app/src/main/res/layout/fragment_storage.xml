@@ -13,7 +13,8 @@
         android:text="@string/add_new_storage_location"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="16dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/storageLocationRecyclerView"

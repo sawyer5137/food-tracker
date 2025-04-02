@@ -1,5 +1,9 @@
 package com.example.foodtracker.ui.adapter;
 
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +43,19 @@ public class StorageLocationAdapter extends RecyclerView.Adapter<StorageLocation
         StorageLocation location = locationList.get(position);
         holder.locationNameText.setText(location.name);
 
+        String countText = String.valueOf(location.itemCount);
+        String suffix = location.itemCount == 1 ? " item" : " items";
+
+        SpannableString spannable = new SpannableString(countText + suffix);
+        spannable.setSpan(
+                new StyleSpan(Typeface.BOLD), // Make the number bold
+                0,
+                countText.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        holder.itemCountText.setText(spannable);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onLocationClick(location);
@@ -59,10 +76,13 @@ public class StorageLocationAdapter extends RecyclerView.Adapter<StorageLocation
 
     static class LocationViewHolder extends RecyclerView.ViewHolder {
         TextView locationNameText;
+        TextView itemCountText;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
-            locationNameText = itemView.findViewById(R.id.locationNameText);
+            locationNameText = itemView.findViewById(R.id.txt_location_name);
+            itemCountText = itemView.findViewById(R.id.txt_item_count);
         }
     }
 }
+

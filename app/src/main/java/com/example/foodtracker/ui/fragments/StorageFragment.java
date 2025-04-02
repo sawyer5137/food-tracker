@@ -16,7 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.foodtracker.R;
+import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.ui.adapter.StorageLocationAdapter;
+import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.example.foodtracker.viewmodel.StorageLocationViewModel;
 
 import java.util.ArrayList;
@@ -35,13 +37,16 @@ public class StorageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+
+        //Get the add button and add event listener to launch from fragment
         addButton = view.findViewById(R.id.btn_add_food);
         addButton.setOnClickListener(v -> {
             FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
 
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, new StorageLocationFormFragment())
-                    .addToBackStack(null) // important: so back button returns to FoodFragment
+                    .addToBackStack(null)
                     .commit();
         });
 
@@ -58,13 +63,27 @@ public class StorageFragment extends Fragment {
                     .commit();
         });
 
+        //Set adapter
         recyclerView.setAdapter(adapter);
 
         //Get View Model
         StorageLocationViewModel storageViewModel = new ViewModelProvider(this).get(StorageLocationViewModel.class);
+        FoodViewModel foodViewModel = new ViewModelProvider(this).get(FoodViewModel.class);
 
         storageViewModel.getAllStorageLocations().observe(getViewLifecycleOwner(), storageLocations -> {
+            // Set up the list in the adapter
             adapter.setLocationList(storageLocations);
+
+            // For each location, observe its food items
+            for (int i = 0; i < storageLocations.size(); i++) {
+                StorageLocation location = storageLocations.get(i);
+                int finalIndex = i;
+
+                foodViewModel.getFoodItemsByLocation(location.id).observe(getViewLifecycleOwner(), foodItems -> {
+                    location.itemCount = foodItems.size();
+                    adapter.notifyItemChanged(finalIndex);
+                });
+            }
         });
 
 

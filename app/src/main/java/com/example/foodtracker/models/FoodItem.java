@@ -24,7 +24,8 @@ public class FoodItem {
     @PrimaryKey(autoGenerate = true)
     public long id;
     public String name;
-    public double quantity;
+    public double originalQuantity;
+    public double currentQuantity;
     public String unit;
     public Date expirationDate;
     public Date purchaseDate;
@@ -32,9 +33,10 @@ public class FoodItem {
 
     public FoodItem() {}
 
-    public FoodItem(String name, double quantity, String unit, Date expirationDate, Date purchaseDate, long storageLocationId) {
+    public FoodItem(String name, double originalQuantity, String unit, Date expirationDate, Date purchaseDate, long storageLocationId) {
         this.name = name;
-        this.quantity = quantity;
+        this.originalQuantity = originalQuantity;
+        this.currentQuantity = originalQuantity;
         this.unit = unit;
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
@@ -45,7 +47,7 @@ public class FoodItem {
     public String toString() {
         return "FoodItem{id=" + id +
                 ", name='" + name + '\'' +
-                ", quantity=" + quantity +
+                ", currentQuantity=" + currentQuantity +
                 ", expirationDate='" + expirationDate + '\'' +
                 ", purchaseDate='" + purchaseDate + '\'' +
                 ", storageLocationId=" + storageLocationId +

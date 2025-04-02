@@ -23,6 +23,7 @@ import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.example.foodtracker.viewmodel.StorageLocationViewModel;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,7 +38,7 @@ public class FoodItemFormFragment extends Fragment {
     private EditText foodNameInput, amountInput, customUnitInput, purchaseDateInput, expireDateInput;
     private Spinner unitSpinner;
     private Button submitButton;
-    private Spinner locationSpinner;
+    private MaterialAutoCompleteTextView locationSpinner;
     private List<StorageLocation> storageLocations;
     private FoodViewModel viewModel;
     private StorageLocationViewModel locationViewModel;

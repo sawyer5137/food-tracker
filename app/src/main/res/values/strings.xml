@@ -17,6 +17,7 @@
     <string name="submit">Submit</string>
     <string name="storage_location">Storage Location</string>
     <string name="custom_unit_optional">Custom Unit (optional)</string>
+    <string name="food_items">Food Items</string>
 
     <string-array name="unit_options">
         <item>grams</item>
