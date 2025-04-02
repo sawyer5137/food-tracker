@@ -34,14 +34,30 @@ public class EditFoodItemFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_edit_food_item, container, false);
+    }
 
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        nameInput = view.findViewById(R.id.foodNameInput);
+        saveButton = view.findViewById(R.id.saveButton);
         SeekBar amountSlider = view.findViewById(R.id.amountSlider);
         TextView amountLabel = view.findViewById(R.id.amountLabel);
 
-        if (existingItem != null && existingItem.originalAmount > 0) {
-            double percentLeft = (existingItem.currentAmount / existingItem.originalAmount) * 100.0;
-            amountSlider.setProgress((int) percentLeft);
-            amountLabel.setText("Amount left: " + (int) percentLeft + "%");
+        foodItemViewModel = new ViewModelProvider(requireActivity()).get(FoodViewModel.class);
+
+        if (getArguments() != null && getArguments().containsKey("foodItem")) {
+            existingItem = (FoodItem) getArguments().getSerializable("foodItem");
+            nameInput.setText(existingItem.name);
+
+            if (existingItem.originalQuantity > 0) {
+                double percentLeft = (existingItem.currentQuantity / existingItem.originalQuantity) * 100.0;
+                amountSlider.setProgress((int) percentLeft);
+                amountLabel.setText("Amount left: " + (int) percentLeft + "%");
+            }
         }
 
         amountSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -50,7 +66,7 @@ public class EditFoodItemFragment extends Fragment {
                 amountLabel.setText("Amount left: " + progress + "%");
 
                 if (existingItem != null) {
-                    existingItem.currentAmount = (progress / 100.0) * existingItem.originalAmount;
+                    existingItem.currentQuantity = (progress / 100.0) * existingItem.originalQuantity;
                 }
             }
 
@@ -58,36 +74,17 @@ public class EditFoodItemFragment extends Fragment {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-
-        return inflater.inflate(R.layout.fragment_edit_food_item, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        nameInput = view.findViewById(R.id.foodNameInput);
-        saveButton = view.findViewById(R.id.saveButton);
-
-        foodItemViewModel = new ViewModelProvider(requireActivity()).get(FoodViewModel.class);
-
-        // Check if an existing item was passed in (for editing)
-        if (getArguments() != null && getArguments().containsKey("foodItem")) {
-            existingItem = (FoodItem) getArguments().getSerializable("foodItem");
-            nameInput.setText(existingItem.name);
-        }
-
         saveButton.setOnClickListener(v -> {
             String newName = nameInput.getText().toString().trim();
             if (!newName.isEmpty()) {
                 if (existingItem != null) {
                     existingItem.name = newName;
                     foodItemViewModel.update(existingItem);
-                } else {
-//                    FoodItem newItem = new FoodItem(newName, ...); // fill out the rest
-//                    foodItemViewModel.insert(newItem);
                 }
                 requireActivity().getSupportFragmentManager().popBackStack();
             }
         });
     }
+
 }
 
