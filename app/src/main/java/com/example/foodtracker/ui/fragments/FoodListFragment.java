@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,15 +27,19 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 public class FoodListFragment extends Fragment {
 
     public final String TAG = "FoodFragment";
     private FloatingActionButton addButton;
-    TextInputEditText searchInput;
+    private TextInputEditText searchInput;
     private TextView noFoodText;
+    private FoodAdapter adapter;
+    private RecyclerView recyclerView;
+    private final android.os.Handler searchHandler = new android.os.Handler();
+    private Runnable searchRunnable;
+
 
     public FoodListFragment() {
         // Required empty public constructor
@@ -67,11 +72,17 @@ public class FoodListFragment extends Fragment {
         searchInput = view.findViewById(R.id.searchInput);
 
         // Initialize recycler view
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        recyclerView.setLayoutAnimation(
+                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_fade_in)
+        );
+
+
+
         // Set up adapter - initially empty list because data comes async from LiveData
-        FoodAdapter adapter = new FoodAdapter(new ArrayList<>(), item -> {
+        adapter = new FoodAdapter(new ArrayList<>(), item -> {
             // Handle click here, e.g., open edit fragment
             EditFoodItemFragment fragment = new EditFoodItemFragment();
 
@@ -100,6 +111,7 @@ public class FoodListFragment extends Fragment {
             } else {
                 noFoodText.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
+                recyclerView.scheduleLayoutAnimation();
             }
         });
 
@@ -114,18 +126,35 @@ public class FoodListFragment extends Fragment {
 
         //Search View
         searchInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().toLowerCase(Locale.ROOT);
-                adapter.filter(query); // This assumes your adapter supports filtering
+                // Cancel any previous search
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+
+                // Schedule new search after delay
+                searchRunnable = () -> {
+                    adapter.filter(s.toString());
+
+                    recyclerView.setLayoutAnimation(
+                            AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_fade_in)
+                    );
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.scheduleLayoutAnimation();
+                };
+
+                // Delay execution
+                searchHandler.postDelayed(searchRunnable, 500); // adjust delay if needed
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
+
+
+
 
     }
 
