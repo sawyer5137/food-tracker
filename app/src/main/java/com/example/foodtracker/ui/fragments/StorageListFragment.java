@@ -1,35 +1,35 @@
 package com.example.foodtracker.ui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.ui.adapter.StorageLocationAdapter;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.example.foodtracker.viewmodel.StorageLocationViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class StorageFragment extends Fragment {
+public class StorageListFragment extends Fragment {
 
-    public final String TAG = "StorageFragment";
-    private Button addButton;
+    private static final String TAG = "StorageFragment";
 
+    private FloatingActionButton addButton;
+    private StorageLocation location;
 
-    public StorageFragment() {
+    public StorageListFragment() {
         // Required empty public constructor
     }
 
@@ -37,58 +37,60 @@ public class StorageFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
-        //Get the add button and add event listener to launch from fragment
-        addButton = view.findViewById(R.id.btn_add_food);
+        // 1. Setup Add Button
+        addButton = view.findViewById(R.id.btn_add_location);
         addButton.setOnClickListener(v -> {
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, new StorageLocationFormFragment())
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new NewStorageLocationFragment())
                     .addToBackStack(null)
                     .commit();
         });
 
-        //Initialize Recycler View
+        // 2. Setup RecyclerView and Adapter
         RecyclerView recyclerView = view.findViewById(R.id.storageLocationRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columns
 
-        //Set up adapter. Initially empty
-        StorageLocationAdapter adapter = new StorageLocationAdapter(new ArrayList<>(), location -> {
-            getParentFragmentManager()
+        StorageLocationAdapter adapter = new StorageLocationAdapter(new ArrayList<>(), selectedLocation -> {
+            requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, FoodFragment.newInstance(location.id))
+                    .replace(R.id.fragment_container, StorageContentsFragment.newInstance(selectedLocation))
                     .addToBackStack(null)
                     .commit();
         });
 
-        //Set adapter
         recyclerView.setAdapter(adapter);
 
-        //Get View Model
+        // 3. Initialize ViewModels
         StorageLocationViewModel storageViewModel = new ViewModelProvider(this).get(StorageLocationViewModel.class);
         FoodViewModel foodViewModel = new ViewModelProvider(this).get(FoodViewModel.class);
 
+        // 4. Optional: Handle passed-in storage location (if any)
+        if (getArguments() != null) {
+            location = (StorageLocation) getArguments().getSerializable("storageLocation");
+
+            foodViewModel.getFoodItemsByLocation(location.id).observe(getViewLifecycleOwner(), items -> {
+                // You might not need this if this fragment doesn't directly show food items
+                Log.d(TAG, "Loaded food items for location " + location.name);
+            });
+        }
+
+        // 5. Observe all storage locations and set their item counts
         storageViewModel.getAllStorageLocations().observe(getViewLifecycleOwner(), storageLocations -> {
-            // Set up the list in the adapter
             adapter.setLocationList(storageLocations);
 
-            // For each location, observe its food items
             for (int i = 0; i < storageLocations.size(); i++) {
-                StorageLocation location = storageLocations.get(i);
+                StorageLocation currentLocation = storageLocations.get(i);
                 int finalIndex = i;
 
-                foodViewModel.getFoodItemsByLocation(location.id).observe(getViewLifecycleOwner(), foodItems -> {
-                    location.itemCount = foodItems.size();
-                    adapter.notifyItemChanged(finalIndex);
-                });
+                foodViewModel.getFoodItemsByLocation(currentLocation.id)
+                        .observe(getViewLifecycleOwner(), foodItems -> {
+                            currentLocation.itemCount = foodItems.size();
+                            adapter.notifyItemChanged(finalIndex);
+                        });
             }
         });
-
-
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -74,4 +74,8 @@ public class AppRepository {
         return allLocationsWithItems;
     }
 
+    public void deleteAllByLocation(long locationId) {
+        databaseExecutor.execute(() -> foodItemDao.deleteAllByLocation(locationId));
+    }
+
 }

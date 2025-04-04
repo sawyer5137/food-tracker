@@ -1,12 +1,8 @@
 ## Features
-- Delete storage locations
-- Delete food items
 - Add food field for incrementing food (3 bananas) and percent food (3 cups of juice)
 - Notifications for expiring foods
 
 ## UI
-- Move add button to circle in bottom corner
-
 - Improve food edit fragment
 - Update storage location adapter so its not ugly
 - Update food adapter to include percent left and make not ugly
@@ -15,7 +11,6 @@
 - Change everything to material
 
 ## Bugs
-- Everything goes into the default storage location
 
 ## Ideas
 - Add barcode scanning 

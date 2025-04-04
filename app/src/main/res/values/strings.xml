@@ -24,6 +24,17 @@
     <string name="default_storage_location">Default Storage Location</string>
     <string name="app_theme">App Theme</string>
     <string name="enable_dark_mode">Enable Dark Mode</string>
+    <string name="food_item_name">Food Item Name</string>
+    <string name="amount">Amount</string>
+    <string name="delete_item">Delete Item</string>
+    <string name="remove_food">Remove Food</string>
+    <string name="food_name">Food Name</string>
+    <string name="amount_left_100">Amount left: 100%</string>
+    <string name="delete_storage_location">Delete Storage Location</string>
+    <string name="no_food_in_this_location">No food in this location</string>
+    <string name="no_food_items_yet">No food items yet</string>
+    <string name="add_food_item">Add food item</string>
+    <string name="search_food">Search food</string>
 
     <string-array name="unit_options">
         <item>grams</item>

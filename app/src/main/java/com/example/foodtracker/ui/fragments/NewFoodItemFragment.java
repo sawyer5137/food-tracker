@@ -2,12 +2,6 @@ package com.example.foodtracker.ui.fragments;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
@@ -25,15 +23,15 @@ import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.example.foodtracker.viewmodel.StorageLocationViewModel;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class FoodItemFormFragment extends Fragment {
+public class NewFoodItemFragment extends Fragment {
 
     private EditText foodNameInput, amountInput, customUnitInput, purchaseDateInput, expireDateInput;
     private Spinner unitSpinner;
@@ -45,7 +43,7 @@ public class FoodItemFormFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_food_item_form, container, false);
+        return inflater.inflate(R.layout.fragment_new_food_item, container, false);
     }
 
     @Override
@@ -83,8 +81,6 @@ public class FoodItemFormFragment extends Fragment {
             );
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             locationSpinner.setAdapter(adapter);
-
-            // Optional: set default selection
             locationSpinner.setSelection(0);
         });
 
@@ -101,26 +97,85 @@ public class FoodItemFormFragment extends Fragment {
                 unit = customUnit;
             }
 
+            // Name Validation
+            //Checks if name is empty
             if (name.isEmpty() || amountText.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill out required fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Please enter a name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            //Checks if name is over 100 characters
+            if (name.length() > 100) {
+                Toast.makeText(requireContext(), "Name is too long. Enter name under 100 characters", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double amount = Double.parseDouble(amountText);
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-            Date purchaseDate = null;
-            Date expireDate = null;
+            // Amount Validation
+            double amount;
             try {
-                purchaseDate = sdf.parse(purchaseDateText);
-                expireDate = sdf.parse(expireDateText);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
+                //Checks if amount is empty
+                amount = Double.parseDouble(amountText);
+                if (amount <= 0) {
+                    Toast.makeText(requireContext(), "Amount must be greater than zero", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), "Invalid amount", Toast.LENGTH_SHORT).show();
+                return;
             }
 
+            //Date validation
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+            Date purchaseDate;
+            Date expireDate;
+            try {
+                //Checks if either dates are empty
+                if (purchaseDateText.isEmpty() || expireDateText.isEmpty()) {
+                    Toast.makeText(requireContext(), "Please select both dates", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                purchaseDate = sdf.parse(purchaseDateText);
+                expireDate = sdf.parse(expireDateText);
+
+                //Checks if expiration date is after purchase date
+                if (expireDate.before(purchaseDate)) {
+                    Toast.makeText(requireContext(), "Expiration date must be after purchase date", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Checks if purchase date is in the future
+                Date today = new Date();
+                if (purchaseDate.after(today)) {
+                    Toast.makeText(requireContext(), "Purchase date can't be in the future", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+            } catch (ParseException e) {
+                //Catch all if fails to parse
+                Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            //Gets and parses location
+            String selectedName = locationSpinner.getText().toString().trim();
+            long locationId = -1;
+
+            for (StorageLocation loc : storageLocations) {
+                if (loc.name.equals(selectedName)) {
+                    locationId = loc.id;
+                    break;
+                }
+            }
+            if (locationId == -1) {
+                Toast.makeText(requireContext(), "Invalid location selected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
             // Create new FoodItem
-            FoodItem item = new FoodItem(name, amount, unit, expireDate, purchaseDate, 1);
+            FoodItem item = new FoodItem(name, amount, unit, expireDate, purchaseDate, locationId);
 
             // Insert using ViewModel
             viewModel.insert(item);

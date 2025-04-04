@@ -7,6 +7,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ public class EditFoodItemFragment extends Fragment {
 
     private EditText nameInput;
     private Button saveButton;
+    private Button removeButton;
     private FoodViewModel foodItemViewModel;
     private FoodItem existingItem;
 
@@ -43,7 +46,8 @@ public class EditFoodItemFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         nameInput = view.findViewById(R.id.foodNameInput);
-        saveButton = view.findViewById(R.id.saveButton);
+        saveButton = view.findViewById(R.id.btn_save);
+        removeButton = view.findViewById(R.id.btn_remove);
         SeekBar amountSlider = view.findViewById(R.id.amountSlider);
         TextView amountLabel = view.findViewById(R.id.amountLabel);
 
@@ -82,6 +86,19 @@ public class EditFoodItemFragment extends Fragment {
                     foodItemViewModel.update(existingItem);
                 }
                 requireActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+        removeButton.setOnClickListener(v -> {
+            if (existingItem != null) {
+                foodItemViewModel.delete(existingItem);
+
+                // Delay the popBackStack just a bit to let LiveData updates settle
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (isAdded()) {
+                        requireActivity().getSupportFragmentManager().popBackStack();
+                    }
+                }, 150);
             }
         });
     }

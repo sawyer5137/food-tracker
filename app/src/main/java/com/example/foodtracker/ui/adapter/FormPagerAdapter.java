@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.foodtracker.ui.fragments.FoodItemFormFragment;
-import com.example.foodtracker.ui.fragments.StorageLocationFormFragment;
+import com.example.foodtracker.ui.fragments.NewFoodItemFragment;
+import com.example.foodtracker.ui.fragments.NewStorageLocationFragment;
 
 public class FormPagerAdapter extends FragmentStateAdapter {
     public FormPagerAdapter(@NonNull Fragment fragment) {
@@ -15,7 +15,7 @@ public class FormPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return position == 0 ? new FoodItemFormFragment() : new StorageLocationFormFragment();
+        return position == 0 ? new NewFoodItemFragment() : new NewStorageLocationFragment();
     }
 
     @Override

@@ -30,4 +30,7 @@ public interface FoodItemDao {
 
     @Query("SELECT * FROM FOODITEM WHERE STORAGELOCATIONID = :locationId")
         LiveData<List<FoodItem>> getFoodItemsByLocation(int locationId);
+
+    @Query("DELETE FROM FoodItem WHERE storageLocationId = :locationId")
+    void deleteAllByLocation(long locationId);
 }

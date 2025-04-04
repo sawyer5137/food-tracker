@@ -2,11 +2,11 @@ package com.example.foodtracker.viewmodel;
 
 
 import android.app.Application;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.foodtracker.models.FoodItem;
-import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.repository.AppRepository;
 
 import java.util.List;
@@ -33,6 +33,11 @@ public class FoodViewModel extends AndroidViewModel {
         return repository.getFoodItemsByLocation(locationId);
     }
 
+    public void deleteAllByLocation(long locationId) {
+        repository.deleteAllByLocation(locationId);
+    }
+
+
     public void insert(FoodItem foodItem) {
         repository.insertFoodItem(foodItem);
     }
@@ -40,5 +45,7 @@ public class FoodViewModel extends AndroidViewModel {
     public void update(FoodItem foodItem) {
         repository.updateFoodItem(foodItem);
     }
+
+    public void delete(FoodItem foodItem) {repository.deleteFoodItem(foodItem);}
 
 }

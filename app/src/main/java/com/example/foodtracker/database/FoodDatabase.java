@@ -45,7 +45,7 @@ public abstract class FoodDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
             databaseExecutor.execute(() -> {
-                // 👇 Preload Storage Locations here
+                //Preload database with locations
                 StorageLocationDao locationDao = INSTANCE.storageLocationDao();
                 locationDao.insertStorageLocations(
                         new StorageLocation("Fridge"),

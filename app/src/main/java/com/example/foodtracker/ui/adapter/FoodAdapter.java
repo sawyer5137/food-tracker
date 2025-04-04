@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,8 +14,7 @@ import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,46 +25,42 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         void onFoodClick(FoodItem item);
     }
 
-    private List<FoodItem> foodList;
     private final OnFoodClickListener listener;
     private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault());
 
-    // Constructor
+    private List<FoodItem> foodList = new ArrayList<>();        // Current displayed list
+    private final List<FoodItem> fullList = new ArrayList<>();  // Full original list (unfiltered)
+
     public FoodAdapter(List<FoodItem> foodList, OnFoodClickListener listener) {
         this.listener = listener;
-        this.foodList = foodList;
+        setFoodList(foodList); // initializes both foodList and fullList
     }
 
     @NonNull
     @Override
     public FoodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the food_item.xml layout for each item
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.food_item, parent, false);
         return new FoodViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
-        // Get the current food item
         FoodItem foodItem = foodList.get(position);
 
-        //Format date
         String formattedDate = sdf.format(foodItem.expirationDate);
         String daysLeft = foodItem.getDaysLeft();
         int textColor;
 
-        //Create text with placeholders based on whether food is already expired
         String expirationText;
-        if(Integer.parseInt(daysLeft) > 0) {
+        if (Integer.parseInt(daysLeft) > 0) {
             expirationText = holder.itemView.getContext().getString(R.string.expires_on_text, formattedDate, daysLeft);
             textColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.dark_green);
-        }else {
-            daysLeft = (Integer.parseInt(daysLeft) * -1) + "";
+        } else {
+            daysLeft = String.valueOf(-Integer.parseInt(daysLeft));
             expirationText = holder.itemView.getContext().getString(R.string.expired_on_text, formattedDate, daysLeft);
             textColor = Color.RED;
         }
 
-        // Set food name and expiration date
         holder.foodName.setText(foodItem.name);
         holder.expirationDate.setText(expirationText);
         holder.expirationDate.setTextColor(textColor);
@@ -83,11 +79,29 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     public void setFoodList(List<FoodItem> newList) {
         this.foodList.clear();
+        this.fullList.clear();
         this.foodList.addAll(newList);
-        notifyItemRangeChanged(0, foodList.size());
+        this.fullList.addAll(newList);
+        notifyDataSetChanged();
     }
 
-    // ViewHolder class holds references to views for each item
+    public void filter(String query) {
+        query = query.toLowerCase(Locale.ROOT);
+        foodList.clear();
+
+        if (query.isEmpty()) {
+            foodList.addAll(fullList);
+        } else {
+            for (FoodItem item : fullList) {
+                if (item.name.toLowerCase(Locale.ROOT).contains(query)) {
+                    foodList.add(item);
+                }
+            }
+        }
+
+        notifyDataSetChanged();
+    }
+
     static class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView foodIcon, foodName, expirationDate;
 
@@ -98,5 +112,4 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             expirationDate = itemView.findViewById(R.id.expirationDate);
         }
     }
-
 }

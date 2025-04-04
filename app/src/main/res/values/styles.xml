@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom FAB style -->
+    <style name="Widget.FoodTracker.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.Circular</item>
+    </style>
+
+    <!-- Circle shape appearance -->
+    <style name="ShapeAppearance.Circular" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>
+
+
+

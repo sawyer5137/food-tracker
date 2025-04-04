@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.foodtracker.R;
-import com.example.foodtracker.ui.fragments.FoodFragment;
+import com.example.foodtracker.ui.fragments.FoodListFragment;
 import com.example.foodtracker.ui.fragments.SettingsFragment;
-import com.example.foodtracker.ui.fragments.StorageFragment;
+import com.example.foodtracker.ui.fragments.StorageListFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         // Show default fragment when activity starts
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new FoodFragment())
+                    .replace(R.id.fragment_container, new FoodListFragment())
                     .commit();
             bottomNav.setSelectedItemId(R.id.nav_food);
         }
@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.nav_food) {
                 Log.d("NAV", "FoodFragment selected");
-                selectedFragment = new FoodFragment();
+                selectedFragment = new FoodListFragment();
             } else if (id == R.id.nav_locations) {
                 Log.d("NAV", "StorageFragment selected");
-                selectedFragment = new StorageFragment();
+                selectedFragment = new StorageListFragment();
             } else if (id == R.id.nav_settings) {
                 Log.d("NAV", "SettingsFragment selected");
                 selectedFragment = new SettingsFragment();
