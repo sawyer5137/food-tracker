@@ -8,6 +8,7 @@ import com.example.foodtracker.database.FoodDatabase;
 import com.example.foodtracker.database.FoodItemDao;
 import com.example.foodtracker.database.StorageLocationDao;
 import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.FoodItemWithLocation;
 import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.ui.adapter.StorageLocationWithItems;
 
@@ -37,9 +38,10 @@ public class AppRepository {
         return allFoodItems;
     }
 
-    public LiveData<List<FoodItem>> getFoodItemsByLocation(int locationId) {
+    public LiveData<List<FoodItemWithLocation>> getFoodItemsByLocation(long locationId) {
         return foodItemDao.getFoodItemsByLocation(locationId);
     }
+
 
     public LiveData<FoodItem> getFoodItemById(int foodId){
         return foodItemDao.getFoodItemByID(foodId);
@@ -53,8 +55,20 @@ public class AppRepository {
         databaseExecutor.execute(() -> foodItemDao.deleteFoodItems(foodItem));
     }
 
+    public LiveData<List<FoodItem>> searchFoodByName(String query) {
+        return foodItemDao.searchFoodByName(query);
+    }
+
+    public LiveData<List<FoodItemWithLocation>> searchFoodWithLocation(String query) {
+        return foodItemDao.searchFoodWithLocation(query);
+    }
+
     public void updateFoodItem(FoodItem foodItem) {
         databaseExecutor.execute(()->foodItemDao.updateFoodItems(foodItem));
+    }
+
+    public LiveData<List<FoodItemWithLocation>> getAllFoodWithLocation() {
+        return foodItemDao.getAllFoodWithLocation();
     }
 
     // StorageLocation Methods

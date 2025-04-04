@@ -1,12 +1,7 @@
 package com.example.foodtracker.ui.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -17,9 +12,16 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.viewmodel.FoodViewModel;
+
+import java.util.Locale;
 
 public class EditFoodItemFragment extends Fragment {
 
@@ -40,7 +42,6 @@ public class EditFoodItemFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_edit_food_item, container, false);
     }
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -57,26 +58,70 @@ public class EditFoodItemFragment extends Fragment {
             existingItem = (FoodItem) getArguments().getSerializable("foodItem");
             nameInput.setText(existingItem.name);
 
-            if (existingItem.originalQuantity > 0) {
-                double percentLeft = (existingItem.currentQuantity / existingItem.originalQuantity) * 100.0;
-                amountSlider.setProgress((int) percentLeft);
-                amountLabel.setText("Amount left: " + (int) percentLeft + "%");
+            // Check if the food is incrementing (e.g. 3 bananas)
+            if (existingItem.isIncrementing) {
+                amountSlider.setMax((int) existingItem.originalQuantity);
+                amountSlider.setKeyProgressIncrement(1);
+                amountSlider.setProgress((int) existingItem.currentQuantity);
+                amountLabel.setText("Amount left: " + (int) existingItem.currentQuantity + " " + existingItem.unit);
+
+                amountSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        amountLabel.setText("Amount left: " + progress + "%");
+
+                        if (existingItem != null) {
+                            existingItem.currentQuantity = (progress / 100.0) * existingItem.originalQuantity;
+
+                            // If it's an incrementing item, round down
+                            if (existingItem.isIncrementing) {
+                                existingItem.currentQuantity = Math.floor(existingItem.currentQuantity);
+                            }
+
+                            // If it's now zero, prompt user
+                            if (existingItem.currentQuantity == 0) {
+                                new AlertDialog.Builder(requireContext())
+                                        .setTitle("Delete Item?")
+                                        .setMessage("This item is now empty. Do you want to remove it?")
+                                        .setPositiveButton("Yes", (dialog, which) -> {
+                                            foodItemViewModel.delete(existingItem);
+                                            requireActivity().getSupportFragmentManager().popBackStack();
+                                        })
+                                        .setNegativeButton("No", (dialog, which) -> {
+                                            // Reset slider to 1% to avoid accidental deletion
+                                            seekBar.setProgress(1);
+                                            existingItem.currentQuantity = (1 / 100.0) * existingItem.originalQuantity;
+                                            amountLabel.setText("Amount left: 1%");
+                                        })
+                                        .show();
+                            }
+                        }
+                    }
+
+
+                    @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+                    @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
+
+            } else {
+                // Variable quantity (e.g. 1500ml of juice)
+                amountSlider.setMax(100);
+                int initialProgress = (int) ((existingItem.currentQuantity / existingItem.originalQuantity) * 100);
+                amountSlider.setProgress(initialProgress);
+                updateVariableLabel(amountLabel, initialProgress, existingItem);
+
+                amountSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        existingItem.currentQuantity = (progress / 100.0) * existingItem.originalQuantity;
+                        updateVariableLabel(amountLabel, progress, existingItem);
+                    }
+
+                    @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+                    @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
             }
         }
-
-        amountSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                amountLabel.setText("Amount left: " + progress + "%");
-
-                if (existingItem != null) {
-                    existingItem.currentQuantity = (progress / 100.0) * existingItem.originalQuantity;
-                }
-            }
-
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
 
         saveButton.setOnClickListener(v -> {
             String newName = nameInput.getText().toString().trim();
@@ -92,8 +137,6 @@ public class EditFoodItemFragment extends Fragment {
         removeButton.setOnClickListener(v -> {
             if (existingItem != null) {
                 foodItemViewModel.delete(existingItem);
-
-                // Delay the popBackStack just a bit to let LiveData updates settle
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (isAdded()) {
                         requireActivity().getSupportFragmentManager().popBackStack();
@@ -103,5 +146,12 @@ public class EditFoodItemFragment extends Fragment {
         });
     }
 
+    // Helper for displaying variable quantity amounts
+    private void updateVariableLabel(TextView label, int percent, FoodItem item) {
+        double current = (percent / 100.0) * item.originalQuantity;
+        String formatted = (current % 1 == 0)
+                ? String.valueOf((int) current)
+                : String.format(Locale.getDefault(), "%.1f", current);
+        label.setText("Amount left: " + formatted + " " + item.unit);
+    }
 }
-

@@ -9,6 +9,20 @@
     <style name="ShapeAppearance.Circular" parent="ShapeAppearance.Material3.Corner.None">
         <item name="cornerSize">50%</item>
     </style>
+
+    <!-- Dropdown border color -->
+    <style name="DropdownHintOverlay" parent="">
+        <item name="hintTextAppearance">@style/DropdownHintText</item>
+        <item name="boxStrokeColor">?attr/colorOutline</item>
+        <item name="boxStrokeWidth">1dp</item>
+    </style>
+
+    <style name="DropdownHintText" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+
+
 </resources>
 
 

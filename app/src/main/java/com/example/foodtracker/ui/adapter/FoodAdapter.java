@@ -1,9 +1,11 @@
 package com.example.foodtracker.ui.adapter;
 
-import android.graphics.Color;
+import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.FoodItemWithLocation;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,16 +28,21 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         void onFoodClick(FoodItem item);
     }
 
+    private List<FoodItemWithLocation> foodList = new ArrayList<>();
+    private final List<FoodItemWithLocation> fullList = new ArrayList<>();
     private final OnFoodClickListener listener;
+    private final boolean showStorageLocation;
+
+
     private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd", Locale.getDefault());
 
-    private List<FoodItem> foodList = new ArrayList<>();        // Current displayed list
-    private final List<FoodItem> fullList = new ArrayList<>();  // Full original list (unfiltered)
 
-    public FoodAdapter(List<FoodItem> foodList, OnFoodClickListener listener) {
+    public FoodAdapter(List<FoodItemWithLocation> foodList, OnFoodClickListener listener, boolean showStorageLocation) {
         this.listener = listener;
-        setFoodList(foodList); // initializes both foodList and fullList
+        this.showStorageLocation = showStorageLocation;
+        setFoodList(foodList);
     }
+
 
     @NonNull
     @Override
@@ -45,26 +53,74 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
-        FoodItem foodItem = foodList.get(position);
+        FoodItemWithLocation itemWithLocation = foodList.get(position);
+        FoodItem foodItem = itemWithLocation.food;
+        String locationName = itemWithLocation.getStorageLocationName();
+        Context context = holder.itemView.getContext();
 
-        String formattedDate = sdf.format(foodItem.expirationDate);
-        String daysLeft = foodItem.getDaysLeft();
-        int textColor;
+        // Set food name
+        holder.foodName.setText(foodItem.name);
 
-        String expirationText;
-        if (Integer.parseInt(daysLeft) > 0) {
-            expirationText = holder.itemView.getContext().getString(R.string.expires_on_text, formattedDate, daysLeft);
-            textColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.dark_green);
+        // Set amount left text
+        String amountStr = (foodItem.currentQuantity % 1 == 0)
+                ? String.valueOf((int) foodItem.currentQuantity)
+                : String.valueOf(foodItem.currentQuantity);
+
+        holder.amountLeft.setText(amountStr + " " + foodItem.unit);
+
+        // Set progress bar
+        int percent = (int) ((foodItem.currentQuantity / foodItem.originalQuantity) * 100);
+        holder.amountProgressBar.setProgress(percent);
+
+        // Set progress bar color
+        int progressColor;
+        if (percent > 75) {
+            progressColor = R.color.dark_green;
+        } else if (percent > 25) {
+            progressColor = R.color.orange;
         } else {
-            daysLeft = String.valueOf(-Integer.parseInt(daysLeft));
-            expirationText = holder.itemView.getContext().getString(R.string.expired_on_text, formattedDate, daysLeft);
-            textColor = Color.RED;
+            progressColor = R.color.red;
+        }
+        holder.amountProgressBar.setProgressTintList(
+                ColorStateList.valueOf(ContextCompat.getColor(context, progressColor))
+        );
+
+        // Show or hide storage location
+        if (showStorageLocation) {
+            holder.storageLocationLabel.setVisibility(View.VISIBLE);
+            holder.storageLocationLabel.setText(locationName);
+        } else {
+            holder.storageLocationLabel.setVisibility(View.GONE);
         }
 
-        holder.foodName.setText(foodItem.name);
-        holder.expirationDate.setText(expirationText);
-        holder.expirationDate.setTextColor(textColor);
+        // Expiration text and color
+        int daysLeft = Integer.parseInt(foodItem.getDaysLeft());
+        String expirationText;
 
+        if (daysLeft >= 0) {
+            expirationText = "Expires in " + daysLeft + (daysLeft == 1 ? " day" : " days");
+        } else {
+            daysLeft = -daysLeft;
+            expirationText = "Expired " + daysLeft + (daysLeft == 1 ? " day ago" : " days ago");
+        }
+
+        holder.expirationText.setText(expirationText);
+
+        int expirationColor;
+        if (daysLeft > 3 && foodItem.expirationDate.after(new java.util.Date())) {
+            expirationColor = R.color.dark_green;
+        } else if (daysLeft >= 0 && foodItem.expirationDate.after(new java.util.Date())) {
+            expirationColor = R.color.orange;
+        } else {
+            expirationColor = R.color.red;
+        }
+
+        holder.expirationText.setTextColor(ContextCompat.getColor(context, expirationColor));
+
+        // Set food icon (static for now)
+        holder.foodIcon.setText("🍔");
+
+        // Click listener
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onFoodClick(foodItem);
@@ -72,16 +128,17 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         });
     }
 
+
     @Override
     public int getItemCount() {
         return foodList.size();
     }
 
-    public void setFoodList(List<FoodItem> newList) {
-        this.foodList.clear();
-        this.fullList.clear();
-        this.foodList.addAll(newList);
-        this.fullList.addAll(newList);
+    public void setFoodList(List<FoodItemWithLocation> newList) {
+        foodList.clear();
+        fullList.clear();
+        foodList.addAll(newList);
+        fullList.addAll(newList);
         notifyDataSetChanged();
     }
 
@@ -92,8 +149,8 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         if (query.isEmpty()) {
             foodList.addAll(fullList);
         } else {
-            for (FoodItem item : fullList) {
-                if (item.name.toLowerCase(Locale.ROOT).contains(query)) {
+            for (FoodItemWithLocation item : fullList) {
+                if (item.food.name.toLowerCase(Locale.ROOT).contains(query)) {
                     foodList.add(item);
                 }
             }
@@ -103,13 +160,19 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
     }
 
     static class FoodViewHolder extends RecyclerView.ViewHolder {
-        TextView foodIcon, foodName, expirationDate;
+        ProgressBar amountProgressBar;
+
+        TextView foodIcon, foodName, expirationText, storageLocationLabel, amountLeft;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
+            amountProgressBar = itemView.findViewById(R.id.amountProgressBar);
             foodIcon = itemView.findViewById(R.id.foodIcon);
             foodName = itemView.findViewById(R.id.foodName);
-            expirationDate = itemView.findViewById(R.id.expirationDate);
+            expirationText = itemView.findViewById(R.id.expirationText);
+            storageLocationLabel = itemView.findViewById(R.id.storageLocationLabel);
+            amountLeft = itemView.findViewById(R.id.amountLeft); // <-- 🔥 Add this
         }
     }
+
 }

@@ -57,7 +57,7 @@ public class StorageContentsFragment extends Fragment {
                     .replace(R.id.fragment_container, fragment)
                     .addToBackStack(null)
                     .commit();
-        });
+        }, false);
 
         recyclerView.setAdapter(adapter);
 

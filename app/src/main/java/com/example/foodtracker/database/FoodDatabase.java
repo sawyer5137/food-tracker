@@ -16,7 +16,7 @@ import com.example.foodtracker.models.StorageLocation;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {FoodItem.class, StorageLocation.class}, version = 4)
+@Database(entities = {FoodItem.class, StorageLocation.class}, version = 5)
 @TypeConverters({DateConverter.class})
 public abstract class FoodDatabase extends RoomDatabase {
     private static volatile FoodDatabase INSTANCE;

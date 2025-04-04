@@ -21,6 +21,7 @@ import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.models.StorageLocation;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.example.foodtracker.viewmodel.StorageLocationViewModel;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.text.ParseException;
@@ -174,10 +175,12 @@ public class NewFoodItemFragment extends Fragment {
             }
 
 
-            // Create new FoodItem
-            FoodItem item = new FoodItem(name, amount, unit, expireDate, purchaseDate, locationId);
+            // Get switch value
+            MaterialSwitch incrementingSwitch = view.findViewById(R.id.switch_is_incrementing);
+            boolean isIncrementing = incrementingSwitch.isChecked();
 
-            // Insert using ViewModel
+            // Create and insert FoodItem
+            FoodItem item = new FoodItem(name, amount, unit, expireDate, purchaseDate, isIncrementing, locationId);
             viewModel.insert(item);
 
             Toast.makeText(requireContext(), "Item added", Toast.LENGTH_SHORT).show();

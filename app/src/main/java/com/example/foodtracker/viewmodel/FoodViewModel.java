@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.FoodItemWithLocation;
 import com.example.foodtracker.repository.AppRepository;
 
 import java.util.List;
@@ -29,14 +30,25 @@ public class FoodViewModel extends AndroidViewModel {
         return repository.getFoodItemById(id);
     }
 
-    public LiveData<List<FoodItem>> getFoodItemsByLocation(int locationId) {
+    public LiveData<List<FoodItemWithLocation>> getFoodItemsByLocation(int locationId) {
         return repository.getFoodItemsByLocation(locationId);
+    }
+
+    public LiveData<List<FoodItemWithLocation>> searchFoodWithLocation(String query) {
+        return repository.searchFoodWithLocation(query);
+    }
+
+    public LiveData<List<FoodItem>> searchFoodByName(String query) {
+        return repository.searchFoodByName(query);
     }
 
     public void deleteAllByLocation(long locationId) {
         repository.deleteAllByLocation(locationId);
     }
 
+    public LiveData<List<FoodItemWithLocation>> getAllFoodWithLocation() {
+        return repository.getAllFoodWithLocation();
+    }
 
     public void insert(FoodItem foodItem) {
         repository.insertFoodItem(foodItem);

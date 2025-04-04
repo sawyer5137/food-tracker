@@ -1,6 +1,5 @@
 package com.example.foodtracker.models;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
@@ -26,6 +25,7 @@ public class FoodItem implements Serializable {
     public long id;
     public String name;
     public double originalQuantity;
+    public boolean isIncrementing; // true = whole number count (e.g. bananas), false = variable (e.g. ml)
     public double currentQuantity;
     public String unit;
     public Date expirationDate;
@@ -34,13 +34,14 @@ public class FoodItem implements Serializable {
 
     public FoodItem() {}
 
-    public FoodItem(String name, double originalQuantity, String unit, Date expirationDate, Date purchaseDate, long storageLocationId) {
+    public FoodItem(String name, double originalQuantity, String unit, Date expirationDate, Date purchaseDate, boolean isIncrementing, long storageLocationId) {
         this.name = name;
         this.originalQuantity = originalQuantity;
         this.currentQuantity = originalQuantity;
         this.unit = unit;
         this.expirationDate = expirationDate;
         this.purchaseDate = purchaseDate;
+        this.isIncrementing = isIncrementing;
         this.storageLocationId = storageLocationId;
     }
 

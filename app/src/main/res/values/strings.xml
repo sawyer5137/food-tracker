@@ -35,6 +35,8 @@
     <string name="no_food_items_yet">No food items yet</string>
     <string name="add_food_item">Add food item</string>
     <string name="search_food">Search food</string>
+    <string name="your_storage">Your Storage</string>
+    <string name="use_whole_numbers_only_e_g_3_bananas">Use whole numbers only (e.g. 3 bananas)</string>
 
     <string-array name="unit_options">
         <item>grams</item>

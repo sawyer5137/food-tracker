@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_theme_dark_primary">#D0BCFF</color>
+    <color name="md_theme_dark_onPrimary">#381E72</color>
+    <color name="md_theme_dark_secondary">#CCC2DC</color>
+    <color name="md_theme_dark_onSecondary">#332D41</color>
+    <color name="md_theme_dark_background">#1C1B1F</color>
+    <color name="md_theme_dark_onBackground">#E6E1E5</color>
+    <color name="card_surface">#424242</color>
+    <color name="search_surface">#292838</color>
+    <color name="dark_text">#AAAAAA</color> <!-- lighter in dark mode -->
+
+
+    <color name="orange">#f08c00</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="dark_green">#00E676</color>
+    <color name="light_grey">#d4d4d4</color>
+    <color name="red">#FF5252</color>
+</resources>
