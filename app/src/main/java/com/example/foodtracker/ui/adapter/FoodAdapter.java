@@ -84,9 +84,11 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
         // Set progress bar color
         int progressColor;
-        if (percent > 75) {
+        if (percent > 70) {
             progressColor = R.color.dark_green;
-        } else if (percent > 25) {
+            }else if(percent > 40){
+            progressColor = R.color.light_green;
+        } else if (percent > 20) {
             progressColor = R.color.orange;
         } else {
             progressColor = R.color.red;

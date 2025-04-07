@@ -10,7 +10,7 @@
     <color name="md_theme_light_onBackground">#1C1B1F</color>
     <color name="card_surface">#FFFFFF</color>
     <color name="search_surface">#F1EDF9</color>
-    <color name="dark_text">#5A5A5A</color> <!-- or go darker like #3C3C3C -->
+    <color name="dark_text">#5A5A5A</color>
 
     <!-- Add dark theme color declarations (fallbacks) -->
     <color name="md_theme_dark_primary">#D0BCFF</color>
@@ -25,6 +25,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="dark_green">#007800</color>
+    <color name="light_green">#0dba04</color>
     <color name="light_grey">#808080</color>
     <color name="red">#f03e3e</color>
 
