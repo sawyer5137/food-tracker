@@ -224,6 +224,7 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     private static final Map<String, String> emojiMap = new HashMap<>();
     static {
+        emojiMap.put("mushroom", "\uD83C\uDF44");
         emojiMap.put("beef", "🥩");
         emojiMap.put("ground beef", "🥩");
         emojiMap.put("pork", "🍖");
@@ -290,7 +291,6 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         emojiMap.put("hotdog", "🌭");
         emojiMap.put("taco", "🌮");
         emojiMap.put("burrito", "🌯");
-        emojiMap.put("stuffed flatbread", "🥙");
         emojiMap.put("falafel", "🧆");
         emojiMap.put("poultry", "🍗");
         emojiMap.put("drumstick", "🍗");
