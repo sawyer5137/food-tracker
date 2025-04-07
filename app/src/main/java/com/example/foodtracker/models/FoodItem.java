@@ -56,6 +56,9 @@ public class FoodItem implements Serializable {
                 '}';
     }
 
+    public boolean isExpired() {
+        return this.expirationDate.before(new Date());
+    }
     public String getDaysLeft() {
         // Reset current time to start of the day (midnight)
         Calendar today = Calendar.getInstance();
