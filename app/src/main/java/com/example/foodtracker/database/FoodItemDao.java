@@ -40,6 +40,9 @@ public interface FoodItemDao {
     @Query("SELECT * FROM FoodItem WHERE name LIKE '%' || :query || '%'")
     LiveData<List<FoodItemWithLocation>> searchFoodWithLocation(String query);
 
+    @Transaction
+    @Query("SELECT * FROM FoodItem ORDER BY lastModified DESC")
+    LiveData<List<FoodItemWithLocation>> getAllFoodWithLocationSortedByLastModified();
 
     @Transaction
     @Query("SELECT * FROM FoodItem")

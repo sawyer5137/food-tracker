@@ -84,6 +84,10 @@ public class AppRepository {
         databaseExecutor.execute(() -> storageLocationDao.deleteStorageLocations(storageLocation));
     }
 
+    public LiveData<List<FoodItemWithLocation>> getAllFoodWithLocationSortedByLastModified() {
+        return foodItemDao.getAllFoodWithLocationSortedByLastModified();
+    }
+
     public LiveData<List<StorageLocationWithItems>> getAllStorageLocationsWithItems() {
         return allLocationsWithItems;
     }

@@ -3,10 +3,10 @@ package com.example.foodtracker.ui.fragments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
+import com.example.foodtracker.models.FoodItemWithLocation;
 import com.example.foodtracker.ui.adapter.FoodAdapter;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,7 +38,7 @@ public class FoodListFragment extends Fragment {
     private TextView noFoodText;
     private FoodAdapter adapter;
     private RecyclerView recyclerView;
-
+    private List<FoodItemWithLocation> fullFoodList = new ArrayList<>();
     private FoodViewModel foodViewModel;
 
     private final android.os.Handler searchHandler = new android.os.Handler();
@@ -79,12 +80,6 @@ public class FoodListFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        recyclerView.setLayoutAnimation(
-                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_fade_in)
-        );
-
-
-
         // Set up adapter - initially empty list because data comes async from LiveData
         adapter = new FoodAdapter(new ArrayList<>(), item -> {
             // Handle click here, e.g., open edit fragment
@@ -105,19 +100,31 @@ public class FoodListFragment extends Fragment {
         // Get ViewModel
         foodViewModel = new ViewModelProvider(this).get(FoodViewModel.class);
 
-        // Observe live data based on storage location
-        foodViewModel.getAllFoodWithLocation().observe(getViewLifecycleOwner(), foodWithLocations -> {
-            adapter.setFoodList(foodWithLocations);
+        // Observe live data with storage location
+        foodViewModel.getAllFoodWithLocationSortedByLastModified().observe(getViewLifecycleOwner(), foodWithLocations -> {
+            Log.d("FOOD_LIST", "Updating adapter with list of size: " + foodWithLocations.size());
 
-            if (foodWithLocations.isEmpty()) {
-                noFoodText.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-            } else {
-                noFoodText.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.scheduleLayoutAnimation();
+            fullFoodList.clear();
+            fullFoodList.addAll(foodWithLocations); // ✅ Keep master copy
+
+            String query = searchInput.getText().toString().toLowerCase().trim();
+
+            List<FoodItemWithLocation> filtered = new ArrayList<>();
+            for (FoodItemWithLocation item : fullFoodList) {
+                if (item.food.name.toLowerCase().contains(query)) {
+                    filtered.add(item);
+                }
             }
+
+            // still update in case of minor change
+            adapter.setFoodList(filtered);
+
+            boolean isEmpty = filtered.isEmpty();
+            noFoodText.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+            recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+
         });
+
 
         //Add button onclick
         addButton.setOnClickListener(v -> {
@@ -128,54 +135,41 @@ public class FoodListFragment extends Fragment {
                     .commit();
         });
 
-        //Search View
+        // Search View
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Cancel any previous search
+                Log.d("SEARCH_INPUT", "Current query: '" + s + "'");
+
                 if (searchRunnable != null) {
                     searchHandler.removeCallbacks(searchRunnable);
                 }
 
-                // Schedule new search after delay
                 searchRunnable = () -> {
-                    adapter.filter(s.toString());
+                    String query = s.toString().toLowerCase().trim();
+                    List<FoodItemWithLocation> filtered = new ArrayList<>();
 
-                    recyclerView.setLayoutAnimation(
-                            AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_fade_in)
-                    );
-                    recyclerView.setAdapter(adapter);
+                    for (FoodItemWithLocation item : fullFoodList) {
+                        if (item.food.name.toLowerCase().contains(query)) {
+                            filtered.add(item);
+                        }
+                    }
+
+                    adapter.setFoodList(filtered);
+
+                    boolean isEmpty = filtered.isEmpty();
+                    noFoodText.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+                    recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
                     recyclerView.scheduleLayoutAnimation();
                 };
 
-                // Delay execution
-                searchHandler.postDelayed(() -> {
-                    if (!isAdded()) return;
-
-                    String query = searchInput.getText().toString();
-                    foodViewModel.searchFoodWithLocation(query).observe(getViewLifecycleOwner(), result -> {
-                        adapter.setFoodList(result);
-
-                        if (result.isEmpty()) {
-                            noFoodText.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                        } else {
-                            noFoodText.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            recyclerView.scheduleLayoutAnimation();
-                        }
-                    });
-
-                }, 300);
-
+                searchHandler.postDelayed(searchRunnable, 300);
             }
 
             @Override public void afterTextChanged(Editable s) {}
         });
-
-
 
 
     }
@@ -192,7 +186,9 @@ public class FoodListFragment extends Fragment {
         String[] foodNames = {
                 "Milk", "Eggs", "Bread", "Chicken", "Apples", "Cheese", "Yogurt",
                 "Lettuce", "Carrots", "Rice", "Pasta", "Ground Beef", "Orange Juice",
-                "Bananas", "Frozen Pizza", "Peanut Butter", "Cereal", "Tomatoes", "Butter", "Fish"
+                "Bananas", "Frozen Pizza", "Peanut Butter", "Cereal", "Tomatoes", "Butter", "Fish",
+                "Strawberries", "Avocados", "Hot Dog", "Bacon", "Mushrooms", "Onions", "Tacos",
+                "Watermelon", "Broccoli", "Sandwich"
         };
 
         Random random = new Random();
@@ -201,33 +197,36 @@ public class FoodListFragment extends Fragment {
         List<FoodItem> testItems = new ArrayList<>();
 
         for (String name : foodNames) {
-            boolean isIncrementing = random.nextBoolean(); // Randomly decide type
+            boolean isIncrementing = random.nextBoolean();
 
             double amount;
             String unit;
 
             if (isIncrementing) {
-                amount = 1 + random.nextInt(5); // whole number
+                amount = 1 + random.nextInt(5); // 1–5
                 unit = "pcs";
             } else {
-                amount = 500 + random.nextInt(2000); // e.g. ml, g, etc.
+                amount = 500 + random.nextInt(2000); // 500–2500
                 unit = random.nextBoolean() ? "ml" : "g";
             }
 
-            // Generate purchase date within last 30 days
+            // Purchase date: random within past 30 days
             long daysAgo = random.nextInt(30);
             long purchaseMillis = today.getTime() - daysAgo * 24L * 60 * 60 * 1000;
             Date purchaseDate = new Date(purchaseMillis);
 
-            // Generate expire date (past or future)
-            long expireOffsetDays = random.nextBoolean()
-                    ? -random.nextInt(10)
-                    : random.nextInt(15);
-            long expireMillis = today.getTime() + expireOffsetDays * 24L * 60 * 60 * 1000;
-            Date expireDate = new Date(expireMillis);
+            // Expiration date
+            Date expireDate;
+            if (random.nextInt(10) == 0) { // 10% chance it's already expired
+                long expireMillis = today.getTime() - (1 + random.nextInt(10)) * 24L * 60 * 60 * 1000;
+                expireDate = new Date(expireMillis);
+            } else {
+                long expireMillis = today.getTime() + random.nextInt(15) * 24L * 60 * 60 * 1000;
+                expireDate = new Date(expireMillis);
+            }
 
-            // 🔀 Random storage location (1, 2, or 3)
-            long storageLocationId = 1 + random.nextInt(3); // gives 1, 2, or 3
+            // Storage location: random 1, 2, or 3
+            long storageLocationId = 1 + random.nextInt(3);
 
             FoodItem item = new FoodItem(name, amount, unit, expireDate, purchaseDate, isIncrementing, storageLocationId);
             testItems.add(item);
@@ -237,7 +236,6 @@ public class FoodListFragment extends Fragment {
             foodViewModel.insert(item);
         }
     }
-
 
 
 }

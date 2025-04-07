@@ -21,6 +21,7 @@ import com.example.foodtracker.R;
 import com.example.foodtracker.models.FoodItem;
 import com.example.foodtracker.viewmodel.FoodViewModel;
 
+import java.util.Date;
 import java.util.Locale;
 
 public class EditFoodItemFragment extends Fragment {
@@ -68,36 +69,25 @@ public class EditFoodItemFragment extends Fragment {
                 amountSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        amountLabel.setText("Amount left: " + progress + "%");
+                        existingItem.currentQuantity = progress;
+                        amountLabel.setText("Amount left: " + progress + " " + existingItem.unit);
 
-                        if (existingItem != null) {
-                            existingItem.currentQuantity = (progress / 100.0) * existingItem.originalQuantity;
-
-                            // If it's an incrementing item, round down
-                            if (existingItem.isIncrementing) {
-                                existingItem.currentQuantity = Math.floor(existingItem.currentQuantity);
-                            }
-
-                            // If it's now zero, prompt user
-                            if (existingItem.currentQuantity == 0) {
-                                new AlertDialog.Builder(requireContext())
-                                        .setTitle("Delete Item?")
-                                        .setMessage("This item is now empty. Do you want to remove it?")
-                                        .setPositiveButton("Yes", (dialog, which) -> {
-                                            foodItemViewModel.delete(existingItem);
-                                            requireActivity().getSupportFragmentManager().popBackStack();
-                                        })
-                                        .setNegativeButton("No", (dialog, which) -> {
-                                            // Reset slider to 1% to avoid accidental deletion
-                                            seekBar.setProgress(1);
-                                            existingItem.currentQuantity = (1 / 100.0) * existingItem.originalQuantity;
-                                            amountLabel.setText("Amount left: 1%");
-                                        })
-                                        .show();
-                            }
+                        if (progress == 0) {
+                            new AlertDialog.Builder(requireContext())
+                                    .setTitle("Delete Item?")
+                                    .setMessage("This item is now empty. Do you want to remove it?")
+                                    .setPositiveButton("Yes", (dialog, which) -> {
+                                        foodItemViewModel.delete(existingItem);
+                                        requireActivity().getSupportFragmentManager().popBackStack();
+                                    })
+                                    .setNegativeButton("No", (dialog, which) -> {
+                                        seekBar.setProgress(1);
+                                        existingItem.currentQuantity = 1;
+                                        amountLabel.setText("Amount left: 1 " + existingItem.unit);
+                                    })
+                                    .show();
                         }
                     }
-
 
                     @Override public void onStartTrackingTouch(SeekBar seekBar) {}
                     @Override public void onStopTrackingTouch(SeekBar seekBar) {}
@@ -128,6 +118,7 @@ public class EditFoodItemFragment extends Fragment {
             if (!newName.isEmpty()) {
                 if (existingItem != null) {
                     existingItem.name = newName;
+                    existingItem.lastModified = new Date();
                     foodItemViewModel.update(existingItem);
                 }
                 requireActivity().getSupportFragmentManager().popBackStack();

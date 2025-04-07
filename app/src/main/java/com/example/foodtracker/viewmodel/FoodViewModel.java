@@ -46,6 +46,10 @@ public class FoodViewModel extends AndroidViewModel {
         repository.deleteAllByLocation(locationId);
     }
 
+    public LiveData<List<FoodItemWithLocation>> getAllFoodWithLocationSortedByLastModified() {
+        return repository.getAllFoodWithLocationSortedByLastModified();
+    }
+
     public LiveData<List<FoodItemWithLocation>> getAllFoodWithLocation() {
         return repository.getAllFoodWithLocation();
     }

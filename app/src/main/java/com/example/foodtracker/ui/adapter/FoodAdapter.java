@@ -2,6 +2,7 @@ package com.example.foodtracker.ui.adapter;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,10 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
+
+        try{
+
+
         FoodItemWithLocation itemWithLocation = foodList.get(position);
         FoodItem foodItem = itemWithLocation.food;
         String locationName = itemWithLocation.getStorageLocationName();
@@ -142,7 +147,10 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             if (listener != null) {
                 listener.onFoodClick(foodItem);
             }
-        });
+        });}catch(Exception e) {
+            Log.e("ADAPTER_BIND", "Error binding view at position " + position, e);
+        }
+
     }
 
 
@@ -151,23 +159,25 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         return foodList.size();
     }
 
-    public void setFoodList(List<FoodItemWithLocation> newList) {
-        foodList.clear();
+    public void setFoodList(List<FoodItemWithLocation> list) {
         fullList.clear();
-        foodList.addAll(newList);
-        fullList.addAll(newList);
+        fullList.addAll(list);
+        foodList.clear();
+        foodList.addAll(list);
         notifyDataSetChanged();
     }
 
     public void filter(String query) {
-        query = query.toLowerCase(Locale.ROOT);
+        Log.d("ADAPTER_FILTER", "Filtering with query: " + query);
+        Log.d("ADAPTER_FILTER", "Filtered size: " + foodList.size());
+
         foodList.clear();
 
         if (query.isEmpty()) {
-            foodList.addAll(fullList);
+            foodList.addAll(fullList); // Restore full list
         } else {
             for (FoodItemWithLocation item : fullList) {
-                if (item.food.name.toLowerCase(Locale.ROOT).contains(query)) {
+                if (item.food.name.toLowerCase().contains(query.toLowerCase())) {
                     foodList.add(item);
                 }
             }
@@ -175,6 +185,7 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
         notifyDataSetChanged();
     }
+
 
     static class FoodViewHolder extends RecyclerView.ViewHolder {
         ProgressBar amountProgressBar;
@@ -190,6 +201,10 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
             storageLocationLabel = itemView.findViewById(R.id.storageLocationLabel);
             amountLeft = itemView.findViewById(R.id.amountLeft);
         }
+    }
+
+    public List<FoodItemWithLocation> getCurrentList() {
+        return foodList;
     }
     private String getEmojiForFoodName(String name) {
         String lower = name.toLowerCase();
